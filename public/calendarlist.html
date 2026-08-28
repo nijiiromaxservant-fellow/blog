@@ -207,7 +207,7 @@
 						if (isRed) colorClass = 'cell-link-sun';
 						else if (isSat) colorClass = 'cell-link-sat';
 
-						html += `<td class="td-cell"><a href="${cleanId}" class="${colorClass}" title="${fullTitle}">${currentDay}</a></td>`;
+						html += `<td class="td-cell"><a href="${cleanId}" class="${colorClass}" title="${fullTitle}" target="_parent">${currentDay}</a></td>`;
 					} else {
 						const spanClass = isRed ? 'cell-span-sun' : 'cell-span-off';
 						html += `<td class="td-off"><span class="${spanClass}">${currentDay}</span></td>`;
@@ -243,7 +243,7 @@
 				if (isRed) linkClass = 'list-link-sun';
 				else if (isSat) linkClass = 'list-link-sat';
 
-				html += `<li class="list-li"><a href="${cleanId}" class="${linkClass}" title="${fullTitle}">${day}日(${dayName}) ${fullTitle}</a></li>`;
+				html += `<li class="list-li"><a href="${cleanId}" class="${linkClass}" title="${fullTitle}" target="_parent">${day}日(${dayName}) ${fullTitle}</a></li>`;
 			} else {
 				let spanClass = 'list-span';
 				if (isRed) spanClass = 'list-span-sun';
