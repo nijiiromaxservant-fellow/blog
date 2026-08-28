@@ -62,18 +62,37 @@
 </div>
 
 <script>
+	function escapeHTML(str) {
+		if (typeof str !== 'string') return '';
+		return str.replace(/[&<>"']/g, function(match) {
+			const escapeMap = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
+			return escapeMap[match];
+		});
+	}
+
+	function getValidParam(paramValue, defaultValue, min, max) {
+		if (!paramValue || !/^\d+$/.test(paramValue)) {
+			return defaultValue;
+		}
+		const num = parseInt(paramValue, 10);
+		if (isNaN(num) || num < min || num > max) {
+			return defaultValue;
+		}
+		return num;
+	}
+
 	const urlParams = new URLSearchParams(window.location.search);
 	const now = new Date();
-	const year = parseInt(urlParams.get('y')) || now.getFullYear();
-	const month = parseInt(urlParams.get('m')) || (now.getMonth() + 1);
 
-	document.getElementById('calendar-title').innerText = `${year}年 ${month}月 虹色MAXカレンダー`;
+	const year = getValidParam(urlParams.get('y'), now.getFullYear(), 1000, 3000);
+	const month = getValidParam(urlParams.get('m'), now.getMonth() + 1, 1, 12);
+
+	document.getElementById('calendar-title').textContent = `${year}年 ${month}月 虹色MAXカレンダー`;
 
 	const formattedMonth = String(month).padStart(2, '0');
 	const jsonFileName = `bloglist_${year}${formattedMonth}.json`;
-	
 	const jsonPath = `/blog/source/${jsonFileName}`;
-
+	
 	const firstDayObj = new Date(year, month - 1, 1);
 	const startDayOfWeek = firstDayObj.getDay(); // 0:日, 1:月, ... 6:土
 	const daysInMonth = new Date(year, month, 0).getDate();
@@ -145,7 +164,9 @@
 			const dataMap = {};
 			if (data && Array.isArray(data.date)) {
 				data.date.forEach(item => {
+					if (item && typeof item.d === 'number') {
 					dataMap[item.d] = item;
+					}
 				});
 			}
 			renderCalendar(dataMap);
@@ -177,12 +198,16 @@
 					const isSat = col === 6;
 
 					if (item) {
-						const fullTitle = `【${item.k}】${item.t}`;
+						const cleanCategory = escapeHTML(String(item.k || ''));
+						const cleanTitle = escapeHTML(String(item.t || ''));
+						const cleanId = escapeHTML(String(item.i || ''));
+						const fullTitle = `【${cleanCategory}】${cleanTitle}`;
+
 						let colorClass = 'cell-link';
 						if (isRed) colorClass = 'cell-link-sun';
 						else if (isSat) colorClass = 'cell-link-sat';
 
-						html += `<td class="td-cell"><a href="${item.i}" class="${colorClass}" title="${fullTitle}">${currentDay}</a></td>`;
+						html += `<td class="td-cell"><a href="${cleanId}" class="${colorClass}" title="${fullTitle}">${currentDay}</a></td>`;
 					} else {
 						const spanClass = isRed ? 'cell-span-sun' : 'cell-span-off';
 						html += `<td class="td-off"><span class="${spanClass}">${currentDay}</span></td>`;
@@ -209,12 +234,16 @@
 			const isSat = dayOfWeekIdx === 6;
 
 			if (item) {
-				const fullTitle = `【${item.k}】${item.t}`;
+				const cleanCategory = escapeHTML(String(item.k || ''));
+				const cleanTitle = escapeHTML(String(item.t || ''));
+				const cleanId = escapeHTML(String(item.i || ''));
+				const fullTitle = `【${cleanCategory}】${cleanTitle}`;
+
 				let linkClass = 'list-link';
 				if (isRed) linkClass = 'list-link-sun';
 				else if (isSat) linkClass = 'list-link-sat';
 
-				html += `<li class="list-li"><a href="${item.i}" class="${linkClass}" title="${fullTitle}">${day}日(${dayName}) ${fullTitle}</a></li>`;
+				html += `<li class="list-li"><a href="${cleanId}" class="${linkClass}" title="${fullTitle}">${day}日(${dayName}) ${fullTitle}</a></li>`;
 			} else {
 				let spanClass = 'list-span';
 				if (isRed) spanClass = 'list-span-sun';
