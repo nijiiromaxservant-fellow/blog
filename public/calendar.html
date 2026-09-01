@@ -29,6 +29,10 @@
 		.list-span { display: block; padding: 8px 10px; color: #333; font-size: 14px; }
 		.list-span-sat { display: block; padding: 8px 10px; color: #0000ff; font-size: 14px; }
 		.list-span-sun { display: block; padding: 8px 10px; color: #ff0000; font-size: 14px; }
+        .td-target-day { background-color: #fff9c4 !important; outline: 2px solid #ff9800; outline-offset: -2px; }
+        .cell-disabled { display: block; padding: 12px 0; color: #888888 !important; cursor: default; }
+        .list-li-target { background-color: #fff9c4 !important; border-left: 4px solid #ff9800; }
+        .list-disabled { display: block; padding: 8px 10px; color: #888888 !important; font-size: 14px; cursor: default; }
 	</style>
 </head>
 <body>
@@ -86,6 +90,8 @@
 
 	const year = getValidParam(urlParams.get('y'), now.getFullYear(), 1000, 3000);
 	const month = getValidParam(urlParams.get('m'), now.getMonth() + 1, 1, 12);
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const dayParam = urlParams.get('d') ? getValidParam(urlParams.get('d'), null, 1, daysInMonth) : null;
 
 	document.getElementById('calendar-title').textContent = `${year}年 ${month}月 虹色MAXカレンダー`;
 
@@ -95,7 +101,6 @@
 	
 	const firstDayObj = new Date(year, month - 1, 1);
 	const startDayOfWeek = firstDayObj.getDay(); // 0:日, 1:月, ... 6:土
-	const daysInMonth = new Date(year, month, 0).getDate();
 	const dayNames = ["日", "月", "火", "水", "木", "金", "土"];
 
 	function getJapaneseHolidays(y) {
@@ -196,6 +201,10 @@
 
 					const isRed = isHolidayOrSunday(currentDay, col);
 					const isSat = col === 6;
+                    const isTargetDay = (currentDay === dayParam);
+
+                    let tdClass = "td-cell";
+                    if (isTargetDay) tdClass += " td-target-day";
 
 					if (item) {
 						const cleanCategory = escapeHTML(String(item.k || ''));
@@ -203,14 +212,18 @@
 						const cleanId = escapeHTML(String(item.i || ''));
 						const fullTitle = `【${cleanCategory}】${cleanTitle}`;
 
+                        if (isTargetDay) {
+                            html += `<td class="${tdClass}"><span class="cell-disabled" title="${fullTitle}">${currentDay}</span></td>`;
+                        } else {
 						let colorClass = 'cell-link';
 						if (isRed) colorClass = 'cell-link-sun';
 						else if (isSat) colorClass = 'cell-link-sat';
 
-						html += `<td class="td-cell"><a href="https://www.nijinohashi.co.jp/article-detail/${cleanId}" class="${colorClass}" title="${fullTitle}" target="_parent">${currentDay}</a></td>`;
+                            html += `<td class="${tdClass}"><a href="https://www.nijinohashi.co.jp/article-detail/${cleanId}" class="${colorClass}" title="${fullTitle}" target="_parent">${currentDay}</a></td>`;
+                        }
 					} else {
 						const spanClass = isRed ? 'cell-span-sun' : 'cell-span-off';
-						html += `<td class="td-off"><span class="${spanClass}">${currentDay}</span></td>`;
+                        html += `<td class="td-off ${isTargetDay ? 'td-target-day' : ''}"><span class="${spanClass}">${currentDay}</span></td>`;
 					}
 					currentDay++;
 				}
@@ -232,6 +245,10 @@
 
 			const isRed = isHolidayOrSunday(day, dayOfWeekIdx);
 			const isSat = dayOfWeekIdx === 6;
+            const isTargetDay = (day === dayParam);
+
+            let liClass = "list-li";
+            if (isTargetDay) liClass += " list-li-target";
 
 			if (item) {
 				const cleanCategory = escapeHTML(String(item.k || ''));
@@ -239,17 +256,21 @@
 				const cleanId = escapeHTML(String(item.i || ''));
 				const fullTitle = `【${cleanCategory}】${cleanTitle}`;
 
+                if (isTargetDay) {
+                    html += `<li class="${liClass}"><span class="list-disabled" title="${fullTitle}">${day}日(${dayName}) ${fullTitle}</span></li>`;
+                } else {
 				let linkClass = 'list-link';
 				if (isRed) linkClass = 'list-link-sun';
 				else if (isSat) linkClass = 'list-link-sat';
 
-				html += `<li class="list-li"><a href="https://www.nijinohashi.co.jp/article-detail/${cleanId}" class="${linkClass}" title="${fullTitle}" target="_parent">${day}日(${dayName}) ${fullTitle}</a></li>`;
+                    html += `<li class="${liClass}"><a href="https://www.nijinohashi.co.jp/article-detail/${cleanId}" class="${linkClass}" title="${fullTitle}" target="_parent">${day}日(${dayName}) ${fullTitle}</a></li>`;
+                }
 			} else {
 				let spanClass = 'list-span';
 				if (isRed) spanClass = 'list-span-sun';
 				else if (isSat) spanClass = 'list-span-sat';
 
-				html += `<li class="list-li-off"><span class="${spanClass}">${day}日(${dayName})</span></li>`;
+                html += `<li class="list-li-off ${isTargetDay ? 'list-li-target' : ''}"><span class="${spanClass}">${day}日(${dayName})</span></li>`;
 			}
 		}
 		ul.innerHTML = html;
