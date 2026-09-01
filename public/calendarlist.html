@@ -24,7 +24,7 @@
             .list-box { max-height: 325px; overflow-y: auto; }
         }
         @media (max-width: 599px) {
-            .list-box { max-height: none !important; overflow-y: visible !important;}
+            .list-box { max-height: none !important; overflow-y: visible !important; }
         }
 
 		.list-ul { list-style: none; margin: 0; padding: 0; }
@@ -298,7 +298,15 @@
                     const boxHeight = listBox.clientHeight;
                         listBox.scrollTop = targetTop - (boxHeight / 2) + (targetHeight / 2);
                     } else {
-                        targetElement.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                        const rect = targetElement.getBoundingClientRect();
+                        const targetTopInIframe = rect.top + window.pageYOffset;
+                        const targetHeight = targetElement.offsetHeight;
+                        const windowHeight = window.innerHeight;
+
+                        window.scrollTo({
+                            top: targetTopInIframe - (windowHeight / 2) + (targetHeight / 2),
+                            behavior: 'smooth'
+                        });
                     }
                 }
             }, 100);
