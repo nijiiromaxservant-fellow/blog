@@ -5,7 +5,7 @@
 	<style>
 		body { margin: 0; padding: 0; font-family: sans-serif; }
 		a { text-decoration: none; }
-		.calendar-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start; margin: 0 auto; text-align: center; box-sizing: border-box; }
+		.calendar-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start; max-width: 750px; margin: 0 auto; text-align: center; box-sizing: border-box; }
 		.cal-box { flex: 1 1 300px; max-width: 350px; text-align: center; box-sizing: border-box; }
 		.cal-table { width: 100%; border-collapse: collapse; text-align: center; background-color: #ffffff; border: 1px solid #ddd; }
 		.cal-title { font-size: 16px; font-weight: bold; padding: 10px 0; text-align: center; }
@@ -19,7 +19,14 @@
 		.cell-link-sun { display: block; padding: 12px 0; color: #ff0000; text-align: center; }
 		.cell-span-sun { display: block; padding: 12px 0; color: #ff0000; text-align: center; }
 		.cell-span-off { display: block; padding: 12px 0; color: #333; text-align: center; }
-		.list-box { flex: 1 1 250px; overflow-y: auto; border: 1px solid #ddd; background-color: #fff; text-align: left; padding: 5px; box-sizing: border-box; }
+		.list-box { flex: 1 1 250px; border: 1px solid #ddd; background-color: #fff; text-align: left; padding: 5px; box-sizing: border-box; }
+        @media (min-width: 600px) {
+            .list-box { max-height: 325px; overflow-y: auto; }
+        }
+        @media (max-width: 599px) {
+            .list-box { max-height: none !important; overflow-y: visible !important;}
+        }
+
 		.list-ul { list-style: none; margin: 0; padding: 0; }
 		.list-li { border-bottom: 1px solid #eee; }
 		.list-li-off { border-bottom: 1px solid #eee; background-color: #808080; }
@@ -285,12 +292,14 @@
                 const listBox = document.getElementById('list-box-container');
 
                 if (targetElement && listBox) {
+                    if (window.innerWidth >= 600) {
                     const targetTop = targetElement.offsetTop;
                     const targetHeight = targetElement.offsetHeight;
                     const boxHeight = listBox.clientHeight;
-
-                    const scrollTo = targetTop - (boxHeight / 2) + (targetHeight / 2);
-                    listBox.scrollTop = scrollTo;
+                        listBox.scrollTop = targetTop - (boxHeight / 2) + (targetHeight / 2);
+                    } else {
+                        targetElement.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                    }
                 }
             }, 100);
         }
