@@ -1,280 +1,368 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-	<meta charset="UTF-8">
-	<style>
-		body { margin: 0; padding: 0; font-family: sans-serif; }
-		a { text-decoration: none; }
-		.calendar-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start; max-width: 750px; margin: 0 auto; text-align: center; box-sizing: border-box; }
-		.cal-box { flex: 1 1 300px; max-width: 350px; text-align: center; box-sizing: border-box; }
-		.cal-table { width: 100%; border-collapse: collapse; text-align: center; background-color: #ffffff; border: 1px solid #ddd; }
-		.cal-title { font-size: 16px; font-weight: bold; padding: 10px 0; text-align: center; }
-		.th-sun { padding: 8px 0; font-size: 14px; color: #ff0000; text-align: center; width: 14.28%; }
-		.th-weekday { padding: 8px 0; font-size: 14px; color: #333333; text-align: center; width: 14.28%; }
-		.th-sat { padding: 8px 0; font-size: 14px; color: #0000ff; text-align: center; width: 14.28%; }
-		.td-cell { border: 1px solid #eee; text-align: center; padding: 0; }
-		.td-off { border: 1px solid #eee; text-align: center; padding: 0; background-color: #808080; }
-		.cell-link { display: block; padding: 12px 0; color: #333; text-align: center; }
-		.cell-link-sat { display: block; padding: 12px 0; color: #0000ff; text-align: center; }
-		.cell-link-sun { display: block; padding: 12px 0; color: #ff0000; text-align: center; }
-		.cell-span-sun { display: block; padding: 12px 0; color: #ff0000; text-align: center; }
-		.cell-span-off { display: block; padding: 12px 0; color: #333; text-align: center; }
-		.list-box { flex: 1 1 250px; max-height: 325px; overflow-y: auto; border: 1px solid #ddd; background-color: #fff; text-align: left; padding: 5px; box-sizing: border-box; }
-		.list-ul { list-style: none; margin: 0; padding: 0; }
-		.list-li { border-bottom: 1px solid #eee; }
-		.list-li-off { border-bottom: 1px solid #eee; background-color: #808080; }
-		.list-link { display: block; padding: 8px 10px; color: #333; font-size: 14px; }
-		.list-link-sat { display: block; padding: 8px 10px; color: #0000ff; font-size: 14px; }
-		.list-link-sun { display: block; padding: 8px 10px; color: #ff0000; font-size: 14px; }
-		.list-span { display: block; padding: 8px 10px; color: #333; font-size: 14px; }
-		.list-span-sat { display: block; padding: 8px 10px; color: #0000ff; font-size: 14px; }
-		.list-span-sun { display: block; padding: 8px 10px; color: #ff0000; font-size: 14px; }
+    <meta charset="UTF-8">
+    <style>
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        a { text-decoration: none; }
+        .calendar-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start; max-width: 750px; margin: 0 auto; text-align: center; box-sizing: border-box; }
+        .cal-box { flex: 1 1 300px; max-width: 350px; text-align: center; box-sizing: border-box; }
+        .cal-table { width: 100%; border-collapse: collapse; text-align: center; background-color: #ffffff; border: 1px solid #ddd; }
+        .cal-header-container { display: flex; align-items: center; justify-content: center; padding: 10px 0; gap: 10px; }
+        .cal-title { font-size: 16px; font-weight: bold; }
+        .nav-btn { background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s; }
+        .nav-btn.disabled { opacity: 0.25; filter: grayscale(100%); cursor: default; pointer-events: none; }
+        .th-sun { padding: 8px 0; font-size: 14px; color: #ff0000; text-align: center; width: 14.28%; }
+        .th-weekday { padding: 8px 0; font-size: 14px; color: #333333; text-align: center; width: 14.28%; }
+        .th-sat { padding: 8px 0; font-size: 14px; color: #0000ff; text-align: center; width: 14.28%; }
+        .td-cell { border: 1px solid #eee; text-align: center; padding: 0; }
+        .td-off { border: 1px solid #eee; text-align: center; padding: 0; background-color: #808080; }
+        .cell-link { display: block; padding: 12px 0; color: #333; text-align: center; }
+        .cell-link-sat { display: block; padding: 12px 0; color: #0000ff; text-align: center; }
+        .cell-link-sun { display: block; padding: 12px 0; color: #ff0000; text-align: center; }
+        .cell-span-sun { display: block; padding: 12px 0; color: #ff0000; text-align: center; }
+        .cell-span-off { display: block; padding: 12px 0; color: #333; text-align: center; }
+        .list-box { flex: 1 1 250px; max-height: 325px; overflow-y: auto; border: 1px solid #ddd; background-color: #fff; text-align: left; padding: 5px; box-sizing: border-box; }
+        .list-ul { list-style: none; margin: 0; padding: 0; }
+        .list-li { border-bottom: 1px solid #eee; }
+        .list-li-off { border-bottom: 1px solid #eee; background-color: #808080; }
+        .list-link { display: block; padding: 8px 10px; color: #333; font-size: 14px; }
+        .list-link-sat { display: block; padding: 8px 10px; color: #0000ff; font-size: 14px; }
+        .list-link-sun { display: block; padding: 8px 10px; color: #ff0000; font-size: 14px; }
+        .list-span { display: block; padding: 8px 10px; color: #333; font-size: 14px; }
+        .list-span-sat { display: block; padding: 8px 10px; color: #0000ff; font-size: 14px; }
+        .list-span-sun { display: block; padding: 8px 10px; color: #ff0000; font-size: 14px; }
         .td-target-day { background-color: #fff9c4 !important; outline: 2px solid #ff9800; outline-offset: -2px; }
         .cell-disabled { display: block; padding: 12px 0; color: #888888 !important; cursor: default; }
         .list-li-target { background-color: #fff9c4 !important; border-left: 4px solid #ff9800; }
         .list-disabled { display: block; padding: 8px 10px; color: #888888 !important; font-size: 14px; cursor: default; }
-	</style>
+    </style>
 </head>
 <body>
 
 <div class="calendar-container">
-	<div class="cal-box">
-		<table class="cal-table">
-			<caption>
-				<div id="calendar-title" class="cal-title"></div>
-			</caption>
-			<thead>
-				<tr>
-					<th class="th-sun">日</th>
-					<th class="th-weekday">月</th>
-					<th class="th-weekday">火</th>
-					<th class="th-weekday">水</th>
-					<th class="th-weekday">木</th>
-					<th class="th-weekday">金</th>
-					<th class="th-sat">土</th>
-				</tr>
-			</thead>
-			<tbody id="calendar-body">
-			</tbody>
-		</table>
-	</div>
+    <div class="cal-box">
+        <table class="cal-table">
+            <caption>
+                <div class="cal-header-container">
+                    <button id="prev-month-btn" class="nav-btn disabled" aria-label="前月">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                          <defs>
+                            <linearGradient id="coolCircleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stop-color="#4F46E5" />
+                              <stop offset="100%" stop-color="#06B6D4" />
+                            </linearGradient>
+                          </defs>
+                          <circle cx="12" cy="12" r="9.5" stroke="url(#coolCircleGrad)" stroke-width="1.5" />
+                          <path d="M 15.5 12 H 8.5 M 12 8.5 L 8.5 12 L 12 15.5" 
+                                stroke="url(#coolCircleGrad)" 
+                                stroke-width="2" 
+                                stroke-linecap="round" 
+                                stroke-linejoin="round" />
+                        </svg>
+                    </button>
 
-	<div class="list-box" style="display: none;">
-		<ul id="item-list" class="list-ul">
-		</ul>
-	</div>
+                    <div id="calendar-title" class="cal-title"></div>
+
+                    <button id="next-month-btn" class="nav-btn disabled" aria-label="次月">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                          <defs>
+                            <linearGradient id="coolCircleGradRight" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stop-color="#4F46E5" />
+                              <stop offset="100%" stop-color="#06B6D4" />
+                            </linearGradient>
+                          </defs>
+                          <circle cx="12" cy="12" r="9.5" stroke="url(#coolCircleGradRight)" stroke-width="1.5" />
+                          <path d="M 8.5 12 H 15.5 M 12 8.5 L 15.5 12 L 12 15.5" 
+                                stroke="url(#coolCircleGradRight)" 
+                                stroke-width="2" 
+                                stroke-linecap="round" 
+                                stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                </div>
+            </caption>
+            <thead>
+                <tr>
+                    <th class="th-sun">日</th>
+                    <th class="th-weekday">月</th>
+                    <th class="th-weekday">火</th>
+                    <th class="th-weekday">水</th>
+                    <th class="th-weekday">木</th>
+                    <th class="th-weekday">金</th>
+                    <th class="th-sat">土</th>
+                </tr>
+            </thead>
+            <tbody id="calendar-body">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="list-box" style="display: none;">
+        <ul id="item-list" class="list-ul">
+        </ul>
+    </div>
 </div>
 
 <script>
-	function escapeHTML(str) {
-		if (typeof str !== 'string') return '';
-		return str.replace(/[&<>"']/g, function(match) {
-			const escapeMap = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
-			return escapeMap[match];
-		});
-	}
+    function escapeHTML(str) {
+        if (typeof str !== 'string') return '';
+        return str.replace(/[&<>"']/g, function(match) {
+            const escapeMap = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
+            return escapeMap[match];
+        });
+    }
 
-	function getValidParam(paramValue, defaultValue, min, max) {
-		if (!paramValue || !/^\d+$/.test(paramValue)) {
-			return defaultValue;
-		}
-		const num = parseInt(paramValue, 10);
-		if (isNaN(num) || num < min || num > max) {
-			return defaultValue;
-		}
-		return num;
-	}
+    function getValidParam(paramValue, defaultValue, min, max) {
+        if (!paramValue || !/^\d+$/.test(paramValue)) {
+            return defaultValue;
+        }
+        const num = parseInt(paramValue, 10);
+        if (isNaN(num) || num < min || num > max) {
+            return defaultValue;
+        }
+        return num;
+    }
 
-	const urlParams = new URLSearchParams(window.location.search);
-	const now = new Date();
+    const urlParams = new URLSearchParams(window.location.search);
+    const now = new Date();
 
-	const year = getValidParam(urlParams.get('y'), now.getFullYear(), 1000, 3000);
-	const month = getValidParam(urlParams.get('m'), now.getMonth() + 1, 1, 12);
+    const year = getValidParam(urlParams.get('y'), now.getFullYear(), 1000, 3000);
+    const month = getValidParam(urlParams.get('m'), now.getMonth() + 1, 1, 12);
     const daysInMonth = new Date(year, month, 0).getDate();
     const dayParam = urlParams.get('d') ? getValidParam(urlParams.get('d'), null, 1, daysInMonth) : null;
 
-	document.getElementById('calendar-title').textContent = `${year}年 ${month}月 虹色MAXカレンダー`;
+    document.getElementById('calendar-title').textContent = `${year}年 ${month}月 虹色MAXカレンダー`;
 
-	const formattedMonth = String(month).padStart(2, '0');
-	const jsonFileName = `bloglist_${year}${formattedMonth}.json`;
-	const jsonPath = `/blog/source/${jsonFileName}`;
-	
-	const firstDayObj = new Date(year, month - 1, 1);
-	const startDayOfWeek = firstDayObj.getDay(); // 0:日, 1:月, ... 6:土
-	const dayNames = ["日", "月", "火", "水", "木", "金", "土"];
+    const formattedMonth = String(month).padStart(2, '0');
+    const jsonFileName = `bloglist_${year}${formattedMonth}.json`;
+    const jsonPath = `/blog/source/${jsonFileName}`;
+    
+    const firstDayObj = new Date(year, month - 1, 1);
+    const startDayOfWeek = firstDayObj.getDay(); // 0:日, 1:月, ... 6:土
+    const dayNames = ["日", "月", "火", "水", "木", "金", "土"];
 
-	function getJapaneseHolidays(y) {
-		const holidays = {};
-		const add = (m, d) => { holidays[`${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`] = true; };
+    function getJapaneseHolidays(y) {
+        const holidays = {};
+        const add = (m, d) => { holidays[`${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`] = true; };
 
-		// 固定祝日
-		add(1, 1); // 元日
-		add(2, 11); // 建国記念の日
-		add(2, 23); // 天皇誕生日
-		add(4, 29); // 昭和の日
-		add(5, 3); // 憲法記念日
-		add(5, 4); // みどりの日
-		add(5, 5); // こどもの日
-		add(8, 11); // 山の日
-		add(11, 3); // 文化の日
-		add(11, 23); // 勤労感謝の日
+        // 固定祝日
+        add(1, 1); // 元日
+        add(2, 11); // 建国記念の日
+        add(2, 23); // 天皇誕生日
+        add(4, 29); // 昭和の日
+        add(5, 3); // 憲法記念日
+        add(5, 4); // みどりの日
+        add(5, 5); // こどもの日
+        add(8, 11); // 山の日
+        add(11, 3); // 文化の日
+        add(11, 23); // 勤労感謝の日
 
-		// ハッピーマンデー (第N月曜日)
-		const getNthMonday = (m, n) => {
-			let first = new Date(y, m - 1, 1).getDay();
-			let day = (1 - first + 7) % 7 + 1 + (n - 1) * 7;
-			return day;
-		};
-		add(1, getNthMonday(1, 2)); // 成人の日 (第2月曜)
-		add(7, getNthMonday(7, 3)); // 海の日 (第3月曜)
-		add(9, getNthMonday(9, 3)); // 敬老の日 (第3月曜)
-		add(10, getNthMonday(10, 2)); // スポーツの日 (第2月曜)
+        // ハッピーマンデー (第N月曜日)
+        const getNthMonday = (m, n) => {
+            let first = new Date(y, m - 1, 1).getDay();
+            let day = (1 - first + 7) % 7 + 1 + (n - 1) * 7;
+            return day;
+        };
+        add(1, getNthMonday(1, 2)); // 成人の日 (第2月曜)
+        add(7, getNthMonday(7, 3)); // 海の日 (第3月曜)
+        add(9, getNthMonday(9, 3)); // 敬老の日 (第3月曜)
+        add(10, getNthMonday(10, 2)); // スポーツの日 (第2月曜)
 
-		// 簡易計算：春分の日・秋分の日
-		const vernalEquinox = Math.floor(20.8431 + 0.242194 * (y - 1980) - Math.floor((y - 1980) / 4));
-		const autumnalEquinox = Math.floor(23.2488 + 0.242194 * (y - 1980) - Math.floor((y - 1980) / 4));
-		add(3, vernalEquinox);
-		add(9, autumnalEquinox);
+        // 簡易計算：春分の日・秋分の日
+        const vernalEquinox = Math.floor(20.8431 + 0.242194 * (y - 1980) - Math.floor((y - 1980) / 4));
+        const autumnalEquinox = Math.floor(23.2488 + 0.242194 * (y - 1980) - Math.floor((y - 1980) / 4));
+        add(3, vernalEquinox);
+        add(9, autumnalEquinox);
 
-		// 振替休日の判定
-		const holidayKeys = Object.keys(holidays);
-		holidayKeys.forEach(dateStr => {
-			let d = new Date(dateStr);
-			if (d.getDay() === 0) { // 日曜日の場合
-				let next = new Date(d);
-				next.setDate(next.getDate() + 1);
-				while (holidays[`${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, '0')}-${String(next.getDate()).padStart(2, '0')}`]) {
-					next.setDate(next.getDate() + 1);
-				}
-				add(next.getMonth() + 1, next.getDate());
-			}
-		});
+        // 振替休日の判定
+        const holidayKeys = Object.keys(holidays);
+        holidayKeys.forEach(dateStr => {
+            let d = new Date(dateStr);
+            if (d.getDay() === 0) { // 日曜日の場合
+                let next = new Date(d);
+                next.setDate(next.getDate() + 1);
+                while (holidays[`${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, '0')}-${String(next.getDate()).padStart(2, '0')}`]) {
+                    next.setDate(next.getDate() + 1);
+                }
+                add(next.getMonth() + 1, next.getDate());
+            }
+        });
 
-		return holidays;
-	}
+        return holidays;
+    }
 
-	const holidays = getJapaneseHolidays(year);
+    const holidays = getJapaneseHolidays(year);
 
-	function isHolidayOrSunday(d, colIndex) {
-		const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-		return colIndex === 0 || !!holidays[dateStr];
-	}
+    function isHolidayOrSunday(d, colIndex) {
+        const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        return colIndex === 0 || !!holidays[dateStr];
+    }
 
-	fetch(jsonPath)
-		.then(response => {
-			if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-			return response.json();
-		})
-		.then(data => {
-			const dataMap = {};
-			if (data && Array.isArray(data.date)) {
-				data.date.forEach(item => {
-					if (item && typeof item.d === 'number') {
-					dataMap[item.d] = item;
-					}
-				});
-			}
-			renderCalendar(dataMap);
-			renderList(dataMap);
-		})
-		.catch(err => {
-			console.error("JSONデータ取得エラー:", err);
-			renderCalendar({});
-			renderList({});
-		});
+    fetch(jsonPath)
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            const dataMap = {};
+            if (data && Array.isArray(data.date)) {
+                data.date.forEach(item => {
+                    if (item && typeof item.d === 'number') {
+                        dataMap[item.d] = item;
+                    }
+                });
+            }
+            renderCalendar(dataMap);
+            renderList(dataMap);
+        })
+        .catch(err => {
+            console.error("JSONデータ取得エラー:", err);
+            renderCalendar({});
+            renderList({});
+        });
 
-	function renderCalendar(dataMap) {
-		const tbody = document.getElementById('calendar-body');
-		let html = '';
-		let currentDay = 1;
+    function setupMonthNavigation(targetYear, targetMonth, btnId) {
+        const btn = document.getElementById(btnId);
+        const targetFormattedMonth = String(targetMonth).padStart(2, '0');
+        const targetJsonPath = `/blog/source/bloglist_${targetYear}${targetFormattedMonth}.json`;
 
-		for (let row = 0; row < 6; row++) {
-			if (currentDay > daysInMonth) break;
-			html += '<tr>';
-			
-			for (let col = 0; col < 7; col++) {
-				if ((row === 0 && col < startDayOfWeek) || currentDay > daysInMonth) {
-					html += '<td class="td-cell">&nbsp;</td>';
-				} else {
-					const dateNum = year * 10000 + month * 100 + currentDay;
-					const item = dataMap[dateNum];
+        fetch(targetJsonPath)
+            .then(response => {
+                if (!response.ok) throw new Error('File not found');
+                return response.json();
+            })
+            .then(data => {
+                const firstDayTargetNum = targetYear * 10000 + targetMonth * 100 + 1;
+                let firstDayItem = null;
 
-					const isRed = isHolidayOrSunday(currentDay, col);
-					const isSat = col === 6;
+                if (data && Array.isArray(data.date)) {
+                    firstDayItem = data.date.find(item => item && item.d === firstDayTargetNum);
+                }
+
+                if (firstDayItem && firstDayItem.i) {
+                    const cleanId = escapeHTML(String(firstDayItem.i));
+                    const targetUrl = `https://www.nijinohashi.co.jp/article-detail/${cleanId}#maxcalendar`;
+
+                    btn.classList.remove('disabled');
+                    btn.onclick = () => {
+                        if (window.parent) {
+                            window.parent.location.href = targetUrl;
+                        } else {
+                            window.location.href = targetUrl;
+                        }
+                    };
+                } else {
+                    btn.classList.add('disabled');
+                }
+            })
+            .catch(() => {
+                btn.classList.add('disabled');
+            });
+    }
+
+    const prevDateObj = new Date(year, month - 2, 1);
+    const prevYear = prevDateObj.getFullYear();
+    const prevMonth = prevDateObj.getMonth() + 1;
+    setupMonthNavigation(prevYear, prevMonth, 'prev-month-btn');
+
+    const nextDateObj = new Date(year, month, 1);
+    const nextYear = nextDateObj.getFullYear();
+    const nextMonth = nextDateObj.getMonth() + 1;
+    setupMonthNavigation(nextYear, nextMonth, 'next-month-btn');
+
+    function renderCalendar(dataMap) {
+        const tbody = document.getElementById('calendar-body');
+        let html = '';
+        let currentDay = 1;
+
+        for (let row = 0; row < 6; row++) {
+            if (currentDay > daysInMonth) break;
+            html += '<tr>';
+            
+            for (let col = 0; col < 7; col++) {
+                if ((row === 0 && col < startDayOfWeek) || currentDay > daysInMonth) {
+                    html += '<td class="td-cell">&nbsp;</td>';
+                } else {
+                    const dateNum = year * 10000 + month * 100 + currentDay;
+                    const item = dataMap[dateNum];
+
+                    const isRed = isHolidayOrSunday(currentDay, col);
+                    const isSat = col === 6;
                     const isTargetDay = (currentDay === dayParam);
 
                     let tdClass = "td-cell";
                     if (isTargetDay) tdClass += " td-target-day";
 
-					if (item) {
-						const cleanCategory = escapeHTML(String(item.k || ''));
-						const cleanTitle = escapeHTML(String(item.t || ''));
-						const cleanId = escapeHTML(String(item.i || ''));
-						const fullTitle = `【${cleanCategory}】${cleanTitle}`;
+                    if (item) {
+                        const cleanCategory = escapeHTML(String(item.k || ''));
+                        const cleanTitle = escapeHTML(String(item.t || ''));
+                        const cleanId = escapeHTML(String(item.i || ''));
+                        const fullTitle = `【${cleanCategory}】${cleanTitle}`;
 
                         if (isTargetDay) {
                             html += `<td class="${tdClass}"><span class="cell-disabled" title="${fullTitle}">${currentDay}</span></td>`;
                         } else {
-						let colorClass = 'cell-link';
-						if (isRed) colorClass = 'cell-link-sun';
-						else if (isSat) colorClass = 'cell-link-sat';
+                            let colorClass = 'cell-link';
+                            if (isRed) colorClass = 'cell-link-sun';
+                            else if (isSat) colorClass = 'cell-link-sat';
 
                             html += `<td class="${tdClass}"><a href="https://www.nijinohashi.co.jp/article-detail/${cleanId}" class="${colorClass}" title="${fullTitle}" target="_parent">${currentDay}</a></td>`;
                         }
-					} else {
-						const spanClass = isRed ? 'cell-span-sun' : 'cell-span-off';
+                    } else {
+                        const spanClass = isRed ? 'cell-span-sun' : 'cell-span-off';
                         html += `<td class="td-off ${isTargetDay ? 'td-target-day' : ''}"><span class="${spanClass}">${currentDay}</span></td>`;
-					}
-					currentDay++;
-				}
-			}
-			html += '</tr>';
-		}
-		tbody.innerHTML = html;
-	}
+                    }
+                    currentDay++;
+                }
+            }
+            html += '</tr>';
+        }
+        tbody.innerHTML = html;
+    }
 
-	function renderList(dataMap) {
-		const ul = document.getElementById('item-list');
-		let html = '';
+    function renderList(dataMap) {
+        const ul = document.getElementById('item-list');
+        let html = '';
 
-		for (let day = 1; day <= daysInMonth; day++) {
-			const dayOfWeekIdx = (startDayOfWeek + day - 1) % 7;
-			const dayName = dayNames[dayOfWeekIdx];
-			const dateNum = year * 10000 + month * 100 + day;
-			const item = dataMap[dateNum];
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayOfWeekIdx = (startDayOfWeek + day - 1) % 7;
+            const dayName = dayNames[dayOfWeekIdx];
+            const dateNum = year * 10000 + month * 100 + day;
+            const item = dataMap[dateNum];
 
-			const isRed = isHolidayOrSunday(day, dayOfWeekIdx);
-			const isSat = dayOfWeekIdx === 6;
+            const isRed = isHolidayOrSunday(day, dayOfWeekIdx);
+            const isSat = dayOfWeekIdx === 6;
             const isTargetDay = (day === dayParam);
 
             let liClass = "list-li";
             if (isTargetDay) liClass += " list-li-target";
 
-			if (item) {
-				const cleanCategory = escapeHTML(String(item.k || ''));
-				const cleanTitle = escapeHTML(String(item.t || ''));
-				const cleanId = escapeHTML(String(item.i || ''));
-				const fullTitle = `【${cleanCategory}】${cleanTitle}`;
+            if (item) {
+                const cleanCategory = escapeHTML(String(item.k || ''));
+                const cleanTitle = escapeHTML(String(item.t || ''));
+                const cleanId = escapeHTML(String(item.i || ''));
+                const fullTitle = `【${cleanCategory}】${cleanTitle}`;
 
                 if (isTargetDay) {
                     html += `<li class="${liClass}"><span class="list-disabled" title="${fullTitle}">${day}日(${dayName}) ${fullTitle}</span></li>`;
                 } else {
-				let linkClass = 'list-link';
-				if (isRed) linkClass = 'list-link-sun';
-				else if (isSat) linkClass = 'list-link-sat';
+                    let linkClass = 'list-link';
+                    if (isRed) linkClass = 'list-link-sun';
+                    else if (isSat) linkClass = 'list-link-sat';
 
                     html += `<li class="${liClass}"><a href="https://www.nijinohashi.co.jp/article-detail/${cleanId}" class="${linkClass}" title="${fullTitle}" target="_parent">${day}日(${dayName}) ${fullTitle}</a></li>`;
                 }
-			} else {
-				let spanClass = 'list-span';
-				if (isRed) spanClass = 'list-span-sun';
-				else if (isSat) spanClass = 'list-span-sat';
+            } else {
+                let spanClass = 'list-span';
+                if (isRed) spanClass = 'list-span-sun';
+                else if (isSat) spanClass = 'list-span-sat';
 
                 html += `<li class="list-li-off ${isTargetDay ? 'list-li-target' : ''}"><span class="${spanClass}">${day}日(${dayName})</span></li>`;
-			}
-		}
-		ul.innerHTML = html;
-	}
+            }
+        }
+        ul.innerHTML = html;
+    }
 </script>
 
 </body>
