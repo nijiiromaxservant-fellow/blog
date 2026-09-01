@@ -59,7 +59,7 @@
 		</table>
 	</div>
 
-	<div class="list-box">
+	<div id="list-box-container" class="list-box">
 		<ul id="item-list" class="list-ul">
 		</ul>
 	</div>
@@ -261,23 +261,39 @@
 				const fullTitle = `【${cleanCategory}】${cleanTitle}`;
 
                 if (isTargetDay) {
-                    html += `<li class="${liClass}"><span class="list-disabled" title="${fullTitle}">${day}日(${dayName}) ${fullTitle}</span></li>`;
+                    html += `<li id="list-item-${day}" class="${liClass}"><span class="list-disabled" title="${fullTitle}">${day}日(${dayName}) ${fullTitle}</span></li>`;
                 } else {
 				let linkClass = 'list-link';
 				if (isRed) linkClass = 'list-link-sun';
 				else if (isSat) linkClass = 'list-link-sat';
 
-                    html += `<li class="${liClass}"><a href="https://www.nijinohashi.co.jp/article-detail/${cleanId}" class="${linkClass}" title="${fullTitle}" target="_parent">${day}日(${dayName}) ${fullTitle}</a></li>`;
+                    html += `<li id="list-item-${day}" class="${liClass}"><a href="https://www.nijinohashi.co.jp/article-detail/${cleanId}" class="${linkClass}" title="${fullTitle}" target="_parent">${day}日(${dayName}) ${fullTitle}</a></li>`;
                 }
 			} else {
 				let spanClass = 'list-span';
 				if (isRed) spanClass = 'list-span-sun';
 				else if (isSat) spanClass = 'list-span-sat';
 
-                html += `<li class="list-li-off ${isTargetDay ? 'list-li-target' : ''}"><span class="${spanClass}">${day}日(${dayName})</span></li>`;
+                html += `<li id="list-item-${day}" class="list-li-off ${isTargetDay ? 'list-li-target' : ''}"><span class="${spanClass}">${day}日(${dayName})</span></li>`;
 			}
 		}
 		ul.innerHTML = html;
+
+        if (dayParam) {
+            setTimeout(() => {
+                const targetElement = document.getElementById(`list-item-${dayParam}`);
+                const listBox = document.getElementById('list-box-container');
+
+                if (targetElement && listBox) {
+                    const targetTop = targetElement.offsetTop;
+                    const targetHeight = targetElement.offsetHeight;
+                    const boxHeight = listBox.clientHeight;
+
+                    const scrollTo = targetTop - (boxHeight / 2) + (targetHeight / 2);
+                    listBox.scrollTop = scrollTo;
+                }
+            }, 100);
+        }
 	}
 </script>
 
